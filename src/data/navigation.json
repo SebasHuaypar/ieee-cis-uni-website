@@ -1,0 +1,11 @@
+{
+  "navbar": [
+    { "name": "Inicio", "path": "/" },
+    { "name": "Nosotros", "path": "/nosotros" },
+    { "name": "Miembros", "path": "/miembros" },
+    { "name": "Proyectos", "path": "/proyectos" },
+    { "name": "Eventos", "path": "/eventos" },
+    { "name": "Blog", "path": "/blog" },
+    { "name": "Contacto", "path": "/contacto" }
+  ]
+}

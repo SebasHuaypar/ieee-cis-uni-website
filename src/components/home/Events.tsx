@@ -1,0 +1,132 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import EventTicket from "@/components/ui/EventTicket";
+import Button from "@/components/ui/Button";
+import { HiArrowRight, HiCalendar } from "react-icons/hi";
+import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
+import { Event } from "@/types/database";
+
+const Events = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchUpcomingEvents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('eventos')
+          .select('*')
+          .eq('is_past', false)
+          .order('fecha', { ascending: true })
+          .limit(3);
+
+        if (!ignore) {
+          if (error) throw error;
+          if (data) setEvents(data);
+        }
+      } catch (error) {
+        console.error('Error fetching upcoming events:', error);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+
+    fetchUpcomingEvents();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const formatDate = (dateStr: string) => {
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+    return new Date(dateStr).toLocaleDateString('es-ES', options);
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { x: -20, opacity: 0 },
+    visible: { x: 0, opacity: 1 }
+  };
+
+  return (
+    <section className="py-24 px-6 md:px-12 lg:px-24 bg-brand-background/50">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-sm font-bold text-brand-accent uppercase tracking-widest mb-4">
+            Próximos Eventos
+          </h2>
+          <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            No te pierdas de nada
+          </h3>
+          <p className="text-white/60 text-lg">
+            Únete a nuestras actividades y potencia tus conocimientos con los líderes en tecnología de la UNI.
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="space-y-6">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="w-full h-40 bg-white/5 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <>
+            <motion.div 
+              className="space-y-6"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {events.map((event) => (
+                <motion.div key={event.id} variants={itemVariants}>
+                  <EventTicket 
+                    title={event.titulo}
+                    date={formatDate(event.fecha)}
+                    time={event.hora || "TBD"}
+                    location={event.ubicacion}
+                    speaker={event.ponente || "Por confirmar"}
+                    category={event.categoria || "EVENTO"}
+                    status="Upcoming"
+                    link={event.link_registro || "#"}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {events.length === 0 && (
+              <div className="text-center py-20 border border-dashed border-white/10 rounded-3xl">
+                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-white/20 mx-auto mb-4">
+                  <HiCalendar size={32} />
+                </div>
+                <p className="text-white/40">No hay eventos programados próximamente.</p>
+              </div>
+            )}
+          </>
+        )}
+
+        <div className="text-center mt-16">
+          <Button href="/eventos" variant="outline" icon={<HiArrowRight />}>
+            Ver calendario completo
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Events;
