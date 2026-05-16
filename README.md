@@ -141,7 +141,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ### Sebastián Huaypar Acurio
 
 Computer Science Student @ UNI  
-AI, Data Science & Analytics Engineering Enthusiast Making websites just for fun  
+AI, Data Science & Analytics Engineering Enthusiast. Making websites just for fun  
 [LinkedIn](https://www.linkedin.com/in/sebashuaypar)
 
 </div>
